@@ -3,6 +3,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from mistral_client import call_mistral_api
 
 app = FastAPI(title='AI Product Pitch Generator API', version='0.1.0')
 
@@ -14,19 +15,13 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
+
 class GenerateRequest(BaseModel):
     idea: str
 
 class GenerateResponse(BaseModel):
     idea: str
     pitch: str
-
-async def call_mistral_api(idea: str):
-    # Placeholder for mocking in tests
-    return {
-        "idea": idea,
-        "pitch": f"Generated pitch for {idea}"
-    }
 
 @app.post("/generate", response_model=GenerateResponse)
 async def generate_pitch(data: GenerateRequest):
