@@ -11,4 +11,5 @@ def generate_pitch(idea: str):
     # Placeholder logic
     return {
         'idea': idea,
-        'pitch': fIntroducing
+        'pitch': f"Introducing {idea}! An innovative solution leveraging AI to transform user experience."
+    }
