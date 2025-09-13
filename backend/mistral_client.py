@@ -1,7 +1,7 @@
 import os
 import httpx
 
-MISTRAL_API_URL = os.getenv("MISTRAL_API_URL", "https://api.mistral.ai/v1/generate")
+MISTRAL_API_URL = os.getenv("MISTRAL_API_URL", "https://api.mistral.ai/v1/chat/completions")
 MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY", "your-mistral-api-key")
 
 async def call_mistral_api(idea: str) -> dict:
@@ -12,12 +12,16 @@ async def call_mistral_api(idea: str) -> dict:
         "Content-Type": "application/json"
     }
     payload = {
-        "prompt": f"Generate a product pitch for: {idea}",
+        "model": "mistral-large-latest",
+        "messages": [
+            {"role": "system", "content": "You are a helpful assistant that generates product pitches."},
+            {"role": "user", "content": f"Generate a product pitch for: {idea}"}
+        ],
         "max_tokens": 128
     }
     async with httpx.AsyncClient() as client:
         response = await client.post(MISTRAL_API_URL, json=payload, headers=headers)
         response.raise_for_status()
         data = response.json()
-        pitch = data.get("choices", [{}])[0].get("text", "")
+        pitch = data.get("choices", [{}])[0].get("message", {}).get("content", "")
         return {"idea": idea, "pitch": pitch}
