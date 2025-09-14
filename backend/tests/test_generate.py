@@ -4,7 +4,13 @@ from httpx import AsyncClient, ASGITransport
 from backend.main import app
 
 @pytest.mark.asyncio
-async def test_generate_success():
+async def test_generate_success(monkeypatch):
+    async def mock_mistral_call(idea):
+        return {
+            "idea": idea,
+            "pitch": f"Mocked pitch for {idea}"
+        }
+    monkeypatch.setattr("backend.main.call_mistral_api", mock_mistral_call)
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         response = await ac.post("/generate", json={"idea": "AI toothbrush"})
